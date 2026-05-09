@@ -42,8 +42,53 @@ document.addEventListener('DOMContentLoaded', () => {
     setupTabNavigation();
     setupFileUpload();
     setupEventListeners();
+    setupButtonRipples();
+    addScrollAnimations();
     loadSubjects();
 });
+
+/**
+ * Setup Button Ripple Effect
+ */
+function setupButtonRipples() {
+    const buttons = document.querySelectorAll('.btn, .tab-button');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple');
+            
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+}
+
+/**
+ * Add Scroll Animations
+ */
+function addScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.upload-section, .prediction-card, .paper-card, .stat-card').forEach(el => {
+        observer.observe(el);
+    });
+}
 
 /**
  * Setup Tab Navigation
@@ -418,10 +463,19 @@ async function loadPapersAnalysis() {
 function showStatus(element, message, type) {
     element.textContent = message;
     element.className = `status-message ${type}`;
+    element.style.animation = 'none';
+    
+    // Trigger reflow to restart animation
+    void element.offsetWidth;
+    element.style.animation = 'slideInDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
 
     if (type !== 'loading') {
         setTimeout(() => {
-            element.className = 'status-message';
+            element.style.animation = 'slideInUp 0.3s ease-out forwards';
+            setTimeout(() => {
+                element.className = 'status-message';
+                element.style.animation = 'none';
+            }, 300);
         }, 5000);
     }
 }
