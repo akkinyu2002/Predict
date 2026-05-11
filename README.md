@@ -166,11 +166,6 @@ You can test the system with:
 
 ## Troubleshooting
 
-### Issue: Files not uploading
-- Check file size (max 50MB)
-- Ensure file is PDF or TXT format
-- Check file permissions
-
 ### Issue: No predictions generated
 - Upload at least 2-3 papers for better predictions
 - Ensure papers have consistent topic naming
